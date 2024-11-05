@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Math Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+    <title>Simple Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-color: #f4f4f4;
         }
-        .calculator-container {
-            width: 400px;
-            background-color: #fff;
-            padding: 20px;
+        .calculator {
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 260px;
         }
         .display {
             width: 100%;
@@ -32,7 +31,7 @@
             padding: 10px;
             border-radius: 5px;
             box-sizing: border-box;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .button-grid {
             display: grid;
@@ -67,51 +66,38 @@
             background-color: #ff4d4d;
             color: white;
         }
-        iframe {
-            display: none;
-        }
     </style>
 </head>
 <body>
 
-    <div class="calculator-container">
+    <div class="calculator">
         <!-- Calculator Display -->
         <div id="display" class="display"></div>
 
         <!-- Calculator Buttons -->
         <div class="button-grid">
             <button class="button clear" onclick="clearDisplay()">C</button>
-            <button class="button operator" onclick="appendToDisplay('(')">(</button>
-            <button class="button operator" onclick="appendToDisplay(')')">)</button>
-            <button class="button operator" onclick="appendToDisplay('%')">%</button>
+            <button class="button operator" onclick="appendToDisplay('/')">/</button>
+            <button class="button operator" onclick="appendToDisplay('*')">*</button>
+            <button class="button operator" onclick="appendToDisplay('-')">-</button>
 
             <button class="button" onclick="appendToDisplay('7')">7</button>
             <button class="button" onclick="appendToDisplay('8')">8</button>
             <button class="button" onclick="appendToDisplay('9')">9</button>
-            <button class="button operator" onclick="appendToDisplay('/')">/</button>
+            <button class="button operator" onclick="appendToDisplay('+')">+</button>
 
             <button class="button" onclick="appendToDisplay('4')">4</button>
             <button class="button" onclick="appendToDisplay('5')">5</button>
             <button class="button" onclick="appendToDisplay('6')">6</button>
-            <button class="button operator" onclick="appendToDisplay('*')">*</button>
+            <button class="button equal" onclick="calculateResult()">=</button>
 
             <button class="button" onclick="appendToDisplay('1')">1</button>
             <button class="button" onclick="appendToDisplay('2')">2</button>
             <button class="button" onclick="appendToDisplay('3')">3</button>
-            <button class="button operator" onclick="appendToDisplay('-')">-</button>
-
             <button class="button" onclick="appendToDisplay('0')">0</button>
+
             <button class="button" onclick="appendToDisplay('.')">.</button>
-            <button class="button equal" onclick="calculateResult()">=</button>
-            <button class="button operator" onclick="appendToDisplay('+')">+</button>
-
-            <button class="button operator" onclick="appendToDisplay('Math.sin(')">sin</button>
-            <button class="button operator" onclick="appendToDisplay('Math.cos(')">cos</button>
-            <button class="button operator" onclick="appendToDisplay('Math.tan(')">tan</button>
-            <button class="button operator" onclick="appendToDisplay('Math.log(')">log</button>
         </div>
-
-        <iframe id="resultFrame" name="resultFrame"></iframe>
     </div>
 
     <script>
@@ -133,13 +119,10 @@
         // Function to evaluate the result
         function calculateResult() {
             try {
-                // Use math.js to evaluate the expression
-                const result = math.evaluate(displayValue);
+                // Use the built-in JavaScript eval() function to evaluate the expression
+                const result = eval(displayValue);
                 document.getElementById('display').innerText = result;
-
-                // Display the result in the iframe (hidden)
-                const resultFrame = document.getElementById('resultFrame');
-                resultFrame.contentDocument.body.innerHTML = '<p>Result: ' + result + '</p>';
+                displayValue = result; // Update display value for further calculations
             } catch (e) {
                 document.getElementById('display').innerText = 'Error';
             }
