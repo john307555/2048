@@ -77,8 +77,8 @@
         <!-- Calculator Buttons -->
         <div class="button-grid">
             <button class="button clear" onclick="clearDisplay()">C</button>
-            <button class="button operator" onclick="appendToDisplay('/')">/</button>
-            <button class="button operator" onclick="appendToDisplay('*')">*</button>
+            <button class="button operator" onclick="appendToDisplay('÷')">÷</button>
+            <button class="button operator" onclick="appendToDisplay('x')">x</button>
             <button class="button operator" onclick="appendToDisplay('-')">-</button>
 
             <button class="button" onclick="appendToDisplay('7')">7</button>
@@ -119,8 +119,9 @@
         // Function to evaluate the result
         function calculateResult() {
             try {
-                // Use the built-in JavaScript eval() function to evaluate the expression
-                const result = eval(displayValue);
+                // Replace custom symbols with standard JavaScript operators
+                const expression = displayValue.replace('x', '*').replace('÷', '/');
+                const result = eval(expression);
                 document.getElementById('display').innerText = result;
                 displayValue = result; // Update display value for further calculations
             } catch (e) {
