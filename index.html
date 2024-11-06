@@ -162,16 +162,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fullscreen Button Example</title>
 
-    <!-- Link to Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <!-- Link to Google Fonts (Roboto font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* Style for the body */
+        /* Google-like styling */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
+            padding: 0;
             height: 100vh;
-            background-color: #f0f3f5;
+            background-color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -180,27 +181,44 @@
         /* Fullscreen button styling */
         #fullscreen-btn {
             position: fixed;
-            top: 10px; /* Adjust for top corner */
-            right: 10px; /* Adjust for right corner */
-            padding: 10px 20px;
-            background-color: #2980b9;
+            top: 15px; /* Adjust for top corner */
+            right: 15px; /* Adjust for right corner */
+            padding: 12px 24px;
+            background-color: #4285F4; /* Google's blue color */
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         #fullscreen-btn:hover {
-            background-color: #3498db;
+            background-color: #3367D6; /* Darker blue on hover */
+            transform: scale(1.05); /* Slightly enlarge on hover */
         }
+
+        #fullscreen-btn:focus {
+            outline: none; /* Remove default focus outline */
+        }
+
+        /* Adding a smooth transition to the page content */
+        .content {
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Fullscreen Button -->
     <button id="fullscreen-btn" onclick="toggleFullscreen()">Go Fullscreen</button>
+
+    <div class="content">
+        <h1>Welcome to My Google-Style Website</h1>
+        <p>Click the button to go fullscreen.</p>
+    </div>
 
     <script>
         // Function to toggle fullscreen mode
