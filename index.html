@@ -3,29 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SchoolWebsties</title>
+  <title>School Websites</title>
+
+  <!-- Google Font for stylish look -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+
   <style>
+    /* Body and Font Styling */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* Title Styling */
+    h2 {
+      font-size: 28px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    /* Button Styling */
     .button {
-      display: block;
-      width: 200px;
-      padding: 10px;
+      display: inline-block;
+      width: 220px;
+      padding: 12px;
       margin: 10px;
       font-size: 18px;
       color: white;
       background-color: #007bff;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       text-align: center;
+      transition: background-color 0.3s, transform 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Button Hover Effect */
     .button:hover {
       background-color: #0056b3;
+      transform: translateY(-3px);
+    }
+    
+    /* Responsive Design for Smaller Screens */
+    @media (max-width: 600px) {
+      .button {
+        width: 80%;
+        font-size: 16px;
+      }
     }
   </style>
 </head>
-<body>
 
-  <h2>Visit Websites</h2>
+<body>
+  <h2>Visit Educational Websites</h2>
 
   <!-- Button for Website 1 -->
   <button class="button" onclick="window.open('https://garhoud-online.almawakeb.sch.ae/', '_blank')">Learn Online</button>
@@ -34,13 +69,13 @@
   <button class="button" onclick="window.open('https://garhoud.almawakeb.sch.ae', '_blank')">School Portal</button>
 
   <!-- Button for Website 3 -->
-  <button class="button" onclick="window.open('https://www.kidsa-z.com/main/Login')">Raz Reading</button>
+  <button class="button" onclick="window.open('https://www.kidsa-z.com/main/Login', '_blank')">Raz Reading</button>
 
   <!-- Button for Website 4 -->
   <button class="button" onclick="window.open('https://sso.alefed.com/login', '_blank')">Alef Arabic Reading</button>
 
   <!-- Button for Website 5 -->
-  <button class="button" onclick="window.open('ixl.com', '_blank')">Ixl</button>
+  <button class="button" onclick="window.open('https://www.ixl.com', '_blank')">IXL</button>
 
   <!-- Button for Website 6 -->
   <button class="button" onclick="window.open('https://sso.rumba.pk12ls.com/sso/login', '_blank')">Savvas Realize</button>
