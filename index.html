@@ -60,23 +60,16 @@
     <script>
         // Function to get Dubai time and display it in 12-hour format with AM/PM
         function updateDubaiTime() {
-            const dubaiOffset = 4 * 60; // Dubai is UTC+4
-            const localTime = new Date();
-            const dubaiTime = new Date(localTime.getTime() + (dubaiOffset * 60 * 1000) - (localTime.getTimezoneOffset() * 60 * 1000));
-            
-            let hours = dubaiTime.getHours();
-            let minutes = dubaiTime.getMinutes();
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // Adjust for 12-hour format
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            
-            const timeString = `${hours}:${minutes} ${ampm}`;
-            document.getElementById('dubai-time').textContent = timeString;
+            const options = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true, timeZone: 'Asia/Dubai' };
+            const dubaiTimeString = new Date().toLocaleString('en-US', options);
+
+            document.getElementById('dubai-time').textContent = dubaiTimeString;
         }
 
         // Update the time every second
         setInterval(updateDubaiTime, 1000);
+        // Initialize the time immediately
+        updateDubaiTime();
     </script>
 
 </body>
