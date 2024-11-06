@@ -73,7 +73,7 @@
     <!-- Dubai time display -->
     <div id="dubai-time-frame">
         <div>Dubai Time</div>
-        <div id="dubai-time">00:00:00</div>
+        <div id="dubai-time">00:00:00 AM</div>
     </div>
 
     <!-- Next Period alert display -->
@@ -98,17 +98,30 @@
             const now = new Date();
             // Convert to Dubai time (UTC+4)
             const dubaiTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
-            const hours = String(dubaiTime.getHours()).padStart(2, '0');
+            let hours = dubaiTime.getHours();
             const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
             const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
 
-            document.getElementById("dubai-time").textContent = `${hours}:${minutes}:${seconds}`;
+            let period = "AM"; // Default to AM
 
-            checkAlarmTime(hours, minutes);
+            // Convert 24-hour format to 12-hour format and set AM/PM
+            if (hours >= 12) {
+                period = "PM";
+                if (hours > 12) {
+                    hours -= 12; // Convert PM hour to 12-hour format
+                }
+            } else if (hours === 0) {
+                hours = 12; // Handle midnight (0:00) case
+            }
+
+            // Display the time with AM/PM
+            document.getElementById("dubai-time").textContent = `${hours}:${minutes}:${seconds} ${period}`;
+
+            checkAlarmTime(hours, minutes, period);
         }
 
         // Function to check if the current time matches one of the specified times
-        function checkAlarmTime(hours, minutes) {
+        function checkAlarmTime(hours, minutes, period) {
             if (!isWeekday()) return; // Exit if not Monday-Thursday
 
             const currentTime = `${hours}:${minutes}`;
