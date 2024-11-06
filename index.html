@@ -23,14 +23,25 @@
             overflow: hidden;
         }
 
-        /* Background blur effect from top to bottom */
-        .background-blur {
+        /* Apply a blurred effect to the middle of the page */
+        .blurred-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            backdrop-filter: blur(8px);
+            z-index: -1;
+        }
+
+        .blurred-bg::before {
+            content: "";
+            position: absolute;
+            top: 30%; /* Center the blur effect vertically */
+            left: 0;
+            width: 100%;
+            height: 40%; /* Height of the blurred area */
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4); /* Semi-transparent black background for the blur effect */
             z-index: -1;
         }
 
@@ -64,7 +75,7 @@
 <body>
 
     <!-- Background blur effect -->
-    <div class="background-blur"></div>
+    <div class="blurred-bg"></div>
 
     <!-- Dubai time display -->
     <div id="dubai-time-frame">
