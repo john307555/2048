@@ -1,13 +1,11 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dubai Local Time</title>
+  <title>AMG Garhoud Time</title>
   <style>
-    /* Center content styling */
+    /* Body and general styling */
     body, html {
       height: 100%;
       display: flex;
@@ -16,57 +14,10 @@
       margin: 0;
       font-family: Arial, sans-serif;
       background-color: #f3f4f6;
+      overflow: hidden;
     }
 
-    /* Clock styling */
-    .clock {
-      font-size: 48px;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Display for Dubai Time -->
-  <div class="clock" id="dubaiClock"></div>
-
-  <script>
-    function updateDubaiTime() {
-      const dubaiOffset = 4 * 60; // Dubai is UTC+4
-      const now = new Date();
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const dubaiTime = new Date(utc + (dubaiOffset * 60000));
-      
-      // Format time to HH:MM:SS
-      const hours = String(dubaiTime.getHours()).padStart(2, '0');
-      const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
-      const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
-      
-      document.getElementById('dubaiClock').textContent = `${hours}:${minutes}:${seconds}`;
-    }
-    
-    // Update the time every second
-    setInterval(updateDubaiTime, 1000);
-    updateDubaiTime(); // Initial call
-  </script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    /* Styling for "Next Period!" message */
+    /* Container for "Next Period!" message */
     #nextPeriodMessage {
       display: none; /* Hidden by default */
       width: 100%;
@@ -81,25 +32,20 @@
       left: 0;
       z-index: 1000;
     }
-    
-    /* Centered clock */
+
+    /* Clock styling */
+    .clock-container {
+      width: 50%;
+      text-align: center;
+      background-color: #ffffff;
+      padding: 40px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
     .clock {
       font-size: 48px;
       color: #333;
-      text-align: center;
-      margin-top: 80px;
-    }
-    
-    /* Styling for page */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f3f4f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      flex-direction: column;
     }
   </style>
 </head>
@@ -108,8 +54,10 @@
   <!-- "Next Period!" message -->
   <div id="nextPeriodMessage">Next Period!</div>
 
-  <!-- Display for Dubai Time -->
-  <div class="clock" id="dubaiClock"></div>
+  <!-- Container for the Dubai Clock -->
+  <div class="clock-container">
+    <div class="clock" id="dubaiClock"></div>
+  </div>
 
   <script>
     function updateDubaiTime() {
@@ -117,26 +65,26 @@
       const now = new Date();
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       const dubaiTime = new Date(utc + (dubaiOffset * 60000));
-      
+
       // Format time to HH:MM:SS
       const hours = String(dubaiTime.getHours()).padStart(2, '0');
       const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
       const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
-      
+
       document.getElementById('dubaiClock').textContent = `${hours}:${minutes}:${seconds}`;
-      
+
       // Show "Next Period!" message if conditions are met
       checkNextPeriod(dubaiTime);
     }
-    
+
     function checkNextPeriod(dubaiTime) {
       // Days: 1 = Monday, 2 = Tuesday, ..., 4 = Thursday
       const day = dubaiTime.getDay();
       const timeStr = `${String(dubaiTime.getHours()).padStart(2, '0')}:${String(dubaiTime.getMinutes()).padStart(2, '0')}`;
-      
+
       // Period times to check
       const periodTimes = ["09:50", "10:50", "10:35", "12:40", "13:25", "14:15"];
-      
+
       // Only check Monday through Thursday
       if (day >= 1 && day <= 4 && periodTimes.includes(timeStr)) {
         document.getElementById('nextPeriodMessage').style.display = 'block';
@@ -144,7 +92,7 @@
         document.getElementById('nextPeriodMessage').style.display = 'none';
       }
     }
-    
+
     // Update the time every second
     setInterval(updateDubaiTime, 1000);
     updateDubaiTime(); // Initial call
@@ -152,4 +100,3 @@
 
 </body>
 </html>
-
