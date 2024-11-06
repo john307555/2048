@@ -3,82 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Websites</title>
-
-  <!-- Google Font for stylish look -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
-
+  <title>Dubai Local Time</title>
   <style>
-    /* Body and Font Styling */
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f3f4f6;
-      color: #333;
-      text-align: center;
+    /* Center content styling */
+    body, html {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin: 0;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
     }
 
-    /* Title Styling */
-    h2 {
-      font-size: 28px;
-      color: #444;
-      margin-bottom: 20px;
-    }
-
-    /* Button Styling */
-    .button {
-      display: inline-block;
-      width: 220px;
-      padding: 12px;
-      margin: 10px;
-      font-size: 18px;
-      color: white;
-      background-color: #007bff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: center;
-      transition: background-color 0.3s, transform 0.3s;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Button Hover Effect */
-    .button:hover {
-      background-color: #0056b3;
-      transform: translateY(-3px);
-    }
-    
-    /* Responsive Design for Smaller Screens */
-    @media (max-width: 600px) {
-      .button {
-        width: 80%;
-        font-size: 16px;
-      }
+    /* Clock styling */
+    .clock {
+      font-size: 48px;
+      color: #333;
     }
   </style>
 </head>
-
 <body>
-  <h2>Visit Educational Websites</h2>
 
-  <!-- Button for Website 1 -->
-  <button class="button" onclick="window.open('https://garhoud-online.almawakeb.sch.ae/', '_blank')">Learn Online</button>
+  <!-- Display for Dubai Time -->
+  <div class="clock" id="dubaiClock"></div>
 
-  <!-- Button for Website 2 -->
-  <button class="button" onclick="window.open('https://garhoud.almawakeb.sch.ae', '_blank')">School Portal</button>
-
-  <!-- Button for Website 3 -->
-  <button class="button" onclick="window.open('https://www.kidsa-z.com/main/Login', '_blank')">Raz Reading</button>
-
-  <!-- Button for Website 4 -->
-  <button class="button" onclick="window.open('https://sso.alefed.com/login', '_blank')">Alef Arabic Reading</button>
-
-  <!-- Button for Website 5 -->
-  <button class="button" onclick="window.open('https://www.ixl.com', '_blank')">IXL</button>
-
-  <!-- Button for Website 6 -->
-  <button class="button" onclick="window.open('https://sso.rumba.pk12ls.com/sso/login', '_blank')">Savvas Realize</button>
+  <script>
+    function updateDubaiTime() {
+      const dubaiOffset = 4 * 60; // Dubai is UTC+4
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const dubaiTime = new Date(utc + (dubaiOffset * 60000));
+      
+      // Format time to HH:MM:SS
+      const hours = String(dubaiTime.getHours()).padStart(2, '0');
+      const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
+      const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
+      
+      document.getElementById('dubaiClock').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    
+    // Update the time every second
+    setInterval(updateDubaiTime, 1000);
+    updateDubaiTime(); // Initial call
+  </script>
 
 </body>
 </html>
