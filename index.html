@@ -1,114 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AMG Garhoud Time</title>
-  <style>
-    /* Body and general styling */
-    body, html {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f3f4f6;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dubai Time with Next Period Alert</title>
+    <style>
+        /* Frame styling for the Dubai clock */
+        #dubai-time-frame {
+            border: 3px solid #2c3e50;
+            border-radius: 15px;
+            width: 250px;
+            padding: 20px;
+            text-align: center;
+            margin: 0 auto;
+            background-color: #ecf0f1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+        }
 
-    /* Container for "Next Period!" message */
-    #nextPeriodMessage {
-      display: none; /* Hidden by default */
-      width: 100%;
-      padding: 10px;
-      background-color: #ffdd57;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-      text-align: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
+        #dubai-time {
+            font-size: 2em;
+            color: #2980b9;
+        }
 
-    /* Clock styling */
-    .clock-container {
-      width: 70%;
-      text-align: center;
-      background-color: #ffffff;
-      padding: 40px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-    }
-
-    .clock {
-      font-size: 48px;
-      color: #333;
-    }
-  </style>
+        /* Styling for the Next Period alert */
+        #alert {
+            color: red;
+            font-size: 24px;
+            font-weight: bold;
+            display: none; /* Hidden initially */
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- Dubai time display -->
+    <div id="dubai-time-frame">
+        <div>Dubai Time</div>
+        <div id="dubai-time">00:00:00</div>
+    </div>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AMG Garhoud Time</title>
-  
-  <!-- Link to Google Material Symbols Outlined for the clock icon -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap" rel="stylesheet">
+    <!-- Next Period alert display -->
+    <div id="alert">Next Period!</div>
 
-  <style>
-    /* Hidden container for rendering the favicon */
-    .favicon {
-      font-family: 'Material Symbols Outlined';
-      font-size: 64px; /* Larger size for clear rendering */
-      color: #007bff;
-      position: absolute;
-      top: -1000px; /* Hide off-screen */
-    }
-  </style>
-</head>
-<body>
+    <script>
+        // Array of times to trigger the Next Period alert (in 24-hour format)
+        const alarmTimes = [
+            "07:50", "08:50", "09:50", "10:50", 
+            "11:35", "12:30", "13:25", "14:15"
+        ];
 
-  <!-- Hidden clock icon text to generate favicon -->
-  <div class="favicon" id="faviconIcon">schedule</div>
+        // Function to check if the current day is Monday to Thursday
+        function isWeekday() {
+            const today = new Date();
+            const day = today.getDay(); // 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday
+            return day >= 1 && day <= 4;
+        }
 
-  <script>
-    function createFavicon() {
-      const iconElement = document.getElementById('faviconIcon');
+        // Function to update the Dubai time every second
+        function updateDubaiTime() {
+            const now = new Date();
+            // Convert to Dubai time (UTC+4)
+            const dubaiTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
+            const hours = String(dubaiTime.getHours()).padStart(2, '0');
+            const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
+            const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
 
-      // Create a canvas to render the icon
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
+            document.getElementById("dubai-time").textContent = `${hours}:${minutes}:${seconds}`;
 
-      // Draw the icon on the canvas
-      ctx.font = '64px Material Symbols Outlined';
-      ctx.fillStyle = '#007bff'; // Blue color for clock icon
-      ctx.fillText('schedule', 0, 48); // 'schedule' represents the clock icon
+            checkAlarmTime(hours, minutes);
+        }
 
-      // Convert canvas to a favicon data URL
-      const link = document.createElement('link');
-      link.rel = 'icon';
-      link.href = canvas.toDataURL();
-      document.head.appendChild(link);
-    }
+        // Function to check if the current time matches one of the specified times
+        function checkAlarmTime(hours, minutes) {
+            if (!isWeekday()) return; // Exit if not Monday-Thursday
 
-    // Generate the favicon on page load
-    createFavicon();
-  </script>
+            const currentTime = `${hours}:${minutes}`;
+
+            // Check if current time is one of the alarm times
+            if (alarmTimes.includes(currentTime)) {
+                triggerAlarm();
+            }
+        }
+
+        // Function to trigger the "Next Period" alert
+        function triggerAlarm() {
+            const alertElement = document.getElementById("alert");
+            alertElement.style.display = "block"; // Show the alert message
+
+            // Hide the alert after 20 seconds
+            setTimeout(() => {
+                alertElement.style.display = "none";
+            }, 20000); // 20 seconds in milliseconds
+        }
+
+        // Update Dubai time every second
+        setInterval(updateDubaiTime, 1000); // 1,000 ms = 1 second
+    </script>
 
 </body>
 </html>
-
-
-
-
-
-
