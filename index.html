@@ -51,63 +51,6 @@
 </head>
 <body>
 
-  <!-- "Next Period!" message -->
-  <div id="nextPeriodMessage">Next Period!</div>
-
-  <!-- Container for the Dubai Clock -->
-  <div class="clock-container">
-    <div class="clock" id="dubaiClock"></div>
-  </div>
-
-  <script>
-    function updateDubaiTime() {
-      const dubaiOffset = 4 * 60; // Dubai is UTC+4
-      const now = new Date();
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const dubaiTime = new Date(utc + (dubaiOffset * 60000));
-
-      // Format time to HH:MM:SS
-      const hours = String(dubaiTime.getHours()).padStart(2, '0');
-      const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
-      const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
-
-      document.getElementById('dubaiClock').textContent = `${hours}:${minutes}:${seconds}`;
-
-      // Show "Next Period!" message if conditions are met
-      checkNextPeriod(dubaiTime);
-    }
-
-    function checkNextPeriod(dubaiTime) {
-      // Days: 1 = Monday, 2 = Tuesday, ..., 4 = Thursday
-      const day = dubaiTime.getDay();
-      const timeStr = `${String(dubaiTime.getHours()).padStart(2, '0')}:${String(dubaiTime.getMinutes()).padStart(2, '0')}`;
-
-      // Period times to check
-      const periodTimes = ["09:50", "10:50", "10:35", "12:40", "13:25", "14:15"];
-
-      // Only check Monday through Thursday
-      if (day >= 1 && day <= 4 && periodTimes.includes(timeStr)) {
-        document.getElementById('nextPeriodMessage').style.display = 'block';
-      } else {
-        document.getElementById('nextPeriodMessage').style.display = 'none';
-      }
-    }
-
-    // Update the time every second
-    setInterval(updateDubaiTime, 1000);
-    updateDubaiTime(); // Initial call
-  </script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -163,4 +106,93 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Period Alarm</title>
+    <style>
+        #alert {
+            color: red;
+            font-size: 24px;
+            font-weight: bold;
+            display: none; /* Hidden initially */
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="alert">Next Period!</div>
+
+    <!-- Audio element for the alarm sound with an external link -->
+    <audio id="alarm-sound">
+        <source src="https://www.youtube.com/watch?v=2gxuIfNeTTE" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Array of times to trigger the alarm (24-hour format)
+        const alarmTimes = [
+            "07:50", "08:50", "09:50", "10:50", 
+            "11:35", "12:30", "13:25", "14:15"
+        ];
+
+        // Function to check if the current day is Monday to Thursday
+        function isWeekday() {
+            const today = new Date();
+            const day = today.getDay(); // 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday
+            return day >= 1 && day <= 4;
+        }
+
+        // Function to check the time and trigger the alert if it matches
+        function checkAlarmTime() {
+            if (!isWeekday()) return; // Exit if not Monday-Thursday
+
+            const now = new Date();
+            const currentTime = now.toTimeString().slice(0, 5); // Get current time in HH:MM format
+
+            // Check if current time is one of the alarm times
+            if (alarmTimes.includes(currentTime)) {
+                triggerAlarm();
+            }
+        }
+
+        // Function to trigger the alarm
+        function triggerAlarm() {
+            const alertElement = document.getElementById("alert");
+            const alarmSound = document.getElementById("alarm-sound");
+
+            alertElement.style.display = "block"; // Show the alert message
+            alarmSound.play(); // Play the alarm sound
+
+            // Hide the alert and stop the sound after 20 seconds
+            setTimeout(() => {
+                alertElement.style.display = "none";
+                alarmSound.pause();
+                alarmSound.currentTime = 0; // Reset the sound
+            }, 20000); // 20 seconds in milliseconds
+        }
+
+        // Check the alarm time every minute
+        setInterval(checkAlarmTime, 60000); // 60,000 ms = 1 minute
+    </script>
+
+</body>
+</html>
+
+
 
