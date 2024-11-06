@@ -100,3 +100,67 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMG Garhoud Time</title>
+  
+  <!-- Link to Google Material Symbols Outlined for the clock icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap" rel="stylesheet">
+
+  <style>
+    /* Hidden container for rendering the favicon */
+    .favicon {
+      font-family: 'Material Symbols Outlined';
+      font-size: 64px; /* Larger size for clear rendering */
+      color: #007bff;
+      position: absolute;
+      top: -1000px; /* Hide off-screen */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden clock icon text to generate favicon -->
+  <div class="favicon" id="faviconIcon">schedule</div>
+
+  <script>
+    function createFavicon() {
+      const iconElement = document.getElementById('faviconIcon');
+
+      // Create a canvas to render the icon
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+
+      // Draw the icon on the canvas
+      ctx.font = '64px Material Symbols Outlined';
+      ctx.fillStyle = '#007bff'; // Blue color for clock icon
+      ctx.fillText('schedule', 0, 48); // 'schedule' represents the clock icon
+
+      // Convert canvas to a favicon data URL
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.href = canvas.toDataURL();
+      document.head.appendChild(link);
+    }
+
+    // Generate the favicon on page load
+    createFavicon();
+  </script>
+
+</body>
+</html>
+
