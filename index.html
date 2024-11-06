@@ -266,3 +266,129 @@
 
 </html>
 
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dubai Time with Next Period Alert</title>
+
+    <!-- Link to the Google Material Symbol font -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+    <!-- CSS for Full Page Layout and Clock Styling -->
+    <style>
+        /* Full page layout with Flexbox to center content */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #3498db, #2ecc71); /* Gradient background */
+            font-family: Arial, sans-serif;
+        }
+
+        /* Frame styling for the Dubai clock */
+        #dubai-time-frame {
+            width: 250px;
+            padding: 20px;
+            text-align: center;
+            background-color: transparent; /* Remove background */
+            box-shadow: none; /* Remove shadow */
+        }
+
+        #dubai-time {
+            font-size: 3em; /* Larger font for the time */
+            color: white; /* White text for better contrast */
+            margin: 0;
+        }
+
+        /* Styling for the Next Period alert */
+        #alert {
+            color: red;
+            font-size: 24px;
+            font-weight: bold;
+            display: none; /* Hidden initially */
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dubai time display -->
+    <div id="dubai-time-frame">
+        <div>Dubai Time</div>
+        <div id="dubai-time">00:00:00</div>
+    </div>
+
+    <!-- Next Period alert display -->
+    <div id="alert">Next Period!</div>
+
+    <script>
+        // Array of times to trigger the Next Period alert (in 24-hour format)
+        const alarmTimes = [
+            "07:50", "08:50", "09:50", "10:50", 
+            "11:35", "12:30", "13:25", "14:15"
+        ];
+
+        // Function to check if the current day is Monday to Thursday
+        function isWeekday() {
+            const today = new Date();
+            const day = today.getDay(); // 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday
+            return day >= 1 && day <= 4;
+        }
+
+        // Function to update the Dubai time every second
+        function updateDubaiTime() {
+            const now = new Date();
+            // Convert to Dubai time (UTC+4)
+            const dubaiTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
+            const hours = String(dubaiTime.getHours() % 12 || 12).padStart(2, '0'); // 12-hour format
+            const minutes = String(dubaiTime.getMinutes()).padStart(2, '0');
+            const seconds = String(dubaiTime.getSeconds()).padStart(2, '0');
+            const ampm = dubaiTime.getHours() >= 12 ? 'PM' : 'AM'; // AM/PM format
+
+            document.getElementById("dubai-time").textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+            checkAlarmTime(hours, minutes);
+        }
+
+        // Function to check if the current time matches one of the specified times
+        function checkAlarmTime(hours, minutes) {
+            if (!isWeekday()) return; // Exit if not Monday-Thursday
+
+            const currentTime = `${hours}:${minutes}`;
+
+            // Check if current time is one of the alarm times
+            if (alarmTimes.includes(currentTime)) {
+                triggerAlarm();
+            }
+        }
+
+        // Function to trigger the "Next Period" alert
+        function triggerAlarm() {
+            const alertElement = document.getElementById("alert");
+            alertElement.style.display = "block"; // Show the alert message
+
+            // Hide the alert after 20 seconds
+            setTimeout(() => {
+                alertElement.style.display = "none";
+            }, 20000); // 20 seconds in milliseconds
+        }
+
+        // Update Dubai time every second
+        setInterval(updateDubaiTime, 1000); // 1,000 ms = 1 second
+    </script>
+
+</body>
+</html>
+
+
