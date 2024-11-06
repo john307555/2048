@@ -154,7 +154,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -215,9 +214,7 @@
     <!-- Fullscreen Button -->
     <button id="fullscreen-btn" onclick="toggleFullscreen()">Go Fullscreen</button>
 
-    <div class="content">
-        
-        
+ 
     </div>
 
     <script>
@@ -247,8 +244,25 @@
                 document.getElementById("fullscreen-btn").textContent = "Go Fullscreen"; // Change button text
             }
         }
+
+        // Listen for fullscreen change events and update button text accordingly
+        document.addEventListener('fullscreenchange', updateFullscreenButtonText);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenButtonText); // Chrome, Safari, Opera
+        document.addEventListener('mozfullscreenchange', updateFullscreenButtonText); // Firefox
+        document.addEventListener('MSFullscreenChange', updateFullscreenButtonText); // IE/Edge
+
+        function updateFullscreenButtonText() {
+            const button = document.getElementById("fullscreen-btn");
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+                button.textContent = "Exit Fullscreen"; // Update text when in fullscreen
+            } else {
+                button.textContent = "Go Fullscreen"; // Reset text when exiting fullscreen
+            }
+        }
     </script>
 
 </body>
+</html>
+
 </html>
 
