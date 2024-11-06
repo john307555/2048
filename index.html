@@ -10,6 +10,18 @@
 
     <!-- CSS to create favicon from Material Symbol icon -->
     <style>
+        /* Full page layout with Flexbox to center content */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f3f5;
+        }
+
         /* Frame styling for the Dubai clock */
         #dubai-time-frame {
             border: 3px solid #2c3e50;
@@ -17,14 +29,12 @@
             width: 250px;
             padding: 20px;
             text-align: center;
-            margin: 0 auto;
             background-color: #ecf0f1;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            font-family: Arial, sans-serif;
         }
 
         #dubai-time {
-            font-size: 2em;
+            font-size: 2.5em;
             color: #2980b9;
         }
 
