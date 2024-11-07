@@ -3,114 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drawing App</title>
+  <title>Full-Screen Drawing App</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      height: 100vh;
+      overflow: hidden;
       font-family: Arial, sans-serif;
     }
 
     #toolbar {
       display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      align-items: center;
+      min-width: 100px;
     }
 
-    button, select, input[type="color"] {
-      padding: 8px;
+    button, input[type="color"], input[type="range"] {
+      padding: 10px;
       font-size: 16px;
       cursor: pointer;
+      color: white;
+      background-color: #444;
+      border: none;
+      outline: none;
+      border-radius: 8px;
+      width: 100%;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    button:hover, input[type="color"]:hover, input[type="range"]:hover {
+      background-color: #555;
+      transform: scale(1.05);
     }
 
     #canvas {
-      border: 1px solid #000;
+      flex-grow: 1;
+      border-left: 2px solid #333;
       cursor: crosshair;
+      touch-action: none; /* Prevents panning and zooming on touch devices */
+    }
+
+    #colorPicker, #sizeSlider {
+      cursor: pointer;
+      padding: 0;
+    }
+
+    label {
+      font-size: 14px;
+      color: white;
     }
   </style>
 </head>
 <body>
   <div id="toolbar">
-    <input type="color" id="colorPicker" title="Select Color">
+    <input type="color" id="colorPicker" title="Brush Color">
     <button onclick="setTool('brush')">Brush</button>
     <button onclick="setTool('eraser')">Eraser</button>
-    <button onclick="fillCanvas()">Fill</button>
+    <label for="sizeSlider">Size: <span id="sizeDisplay">5</span> px</label>
+    <input type="range" id="sizeSlider" min="1" max="50" value="5" title="Brush/Eraser Size">
+    <button onclick="eraseAll()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
   </div>
   
-  <canvas id="canvas" width="800" height="600"></canvas>
+  <canvas id="canvas"></canvas>
 
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const colorPicker = document.getElementById('colorPicker');
+    const sizeSlider = document.getElementById('sizeSlider');
+    const sizeDisplay = document.getElementById('sizeDisplay');
     
     let drawing = false;
     let tool = 'brush';
     let currentColor = colorPicker.value;
+    let brushSize = sizeSlider.value;
 
-    // Set canvas background to white by default
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Resize canvas to fill available space
+    function resizeCanvas() {
+      canvas.width = window.innerWidth - document.getElementById('toolbar').offsetWidth;
+      canvas.height = window.innerHeight;
+      // Fill with white initially
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
     // Tool selector
     function setTool(selectedTool) {
       tool = selectedTool;
-      if (tool === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out'; // Eraser mode
-      } else {
-        ctx.globalCompositeOperation = 'source-over'; // Normal mode
-      }
+      ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
     }
 
-    // Update color on color picker change
+    // Update brush color on color picker change
     colorPicker.addEventListener('input', () => {
       currentColor = colorPicker.value;
-      if (tool !== 'eraser') {
+      if (tool === 'brush') {
         ctx.strokeStyle = currentColor;
-        ctx.fillStyle = currentColor;
       }
+    });
+
+    // Update brush/eraser size on slider change
+    sizeSlider.addEventListener('input', () => {
+      brushSize = sizeSlider.value;
+      sizeDisplay.textContent = brushSize;
     });
 
     // Start drawing
-    canvas.addEventListener('mousedown', (e) => {
+    function startDrawing(x, y) {
       drawing = true;
       ctx.beginPath();
-      ctx.moveTo(e.offsetX, e.offsetY);
-    });
+      ctx.moveTo(x, y);
+    }
 
     // Draw on canvas
-    canvas.addEventListener('mousemove', (e) => {
+    function draw(x, y) {
       if (!drawing) return;
+
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = 'round';
+
       if (tool === 'brush') {
         ctx.strokeStyle = currentColor;
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-      } else if (tool === 'eraser') {
-        ctx.lineWidth = 20;
-        ctx.lineCap = 'round';
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
       }
-    });
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
 
     // Stop drawing
-    canvas.addEventListener('mouseup', () => {
+    function stopDrawing() {
       drawing = false;
       ctx.closePath();
+    }
+
+    // Mouse events
+    canvas.addEventListener('mousedown', (e) => startDrawing(e.offsetX, e.offsetY));
+    canvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    // Touch events for mobile support
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
     });
 
-    canvas.addEventListener('mouseleave', () => {
-      drawing = false;
+    canvas.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      draw(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
     });
 
-    // Fill canvas with selected color
-    function fillCanvas() {
-      ctx.fillStyle = currentColor;
-      ctx.globalCompositeOperation = 'source-over'; // Normal mode
+    canvas.addEventListener('touchend', (e) => {
+      stopDrawing();
+      e.preventDefault();
+    });
+
+    // Erase all content on the canvas
+    function eraseAll() {
+      ctx.fillStyle = '#ffffff';
+      ctx.globalCompositeOperation = 'source-over';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
