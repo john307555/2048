@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Full-Screen Drawing App</title>
   <style>
+    /* CSS styling remains unchanged */
     * {
       margin: 0;
       padding: 0;
@@ -112,6 +113,7 @@
     let currentColor = colorPicker.value;
     let brushSize = sizeInput.value;
     let tracingImage = null;
+    let imageData = null;
 
     // Resize canvas to fill available space
     function resizeCanvas() {
@@ -119,6 +121,9 @@
       canvas.height = window.innerHeight;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (imageData) {
+        ctx.putImageData(imageData, 0, 0); // Restore drawing after resizing
+      }
     }
 
     window.addEventListener('resize', resizeCanvas);
@@ -170,6 +175,7 @@
     function stopDrawing() {
       drawing = false;
       ctx.closePath();
+      imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // Save current drawing
     }
 
     // Mouse events
@@ -203,6 +209,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      imageData = null; // Clear drawing history
       if (tracingImage) {
         removeImage(); // Hide tracing image if it exists
       }
@@ -243,12 +250,11 @@
 
     // Remove the tracing image from the canvas
     function removeImage() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-      resizeCanvas(); // Refill with white background
-      tracingImage = null; // Reset the tracing image reference
-
-      // Hide the Remove Image button
-      removeImageBtn.style.display = 'none';
+      if (imageData) {
+        ctx.putImageData(imageData, 0, 0); // Restore drawing without tracing image
+      }
+      tracingImage = null; // Clear the tracing image reference
+      removeImageBtn.style.display = 'none'; // Hide the Remove Image button
     }
 
     // Initial update for the size input
