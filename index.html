@@ -48,11 +48,16 @@
       transform: scale(1.05);
     }
 
-    #canvas {
+    .canvas-container {
+      position: relative;
       flex-grow: 1;
-      border-left: 2px solid #333;
-      cursor: crosshair;
-      touch-action: none; /* Prevents panning and zooming on touch devices */
+      display: flex;
+    }
+
+    canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
     }
 
     #colorPicker, #sizeInput {
@@ -65,12 +70,10 @@
       color: white;
     }
 
-    /* Hidden file input */
     #fileInput {
       display: none;
     }
 
-    /* Initially hide Remove Image button */
     #removeImageBtn {
       display: none;
     }
@@ -87,22 +90,25 @@
     <label for="sizeInput">Size:</label>
     <input type="number" id="sizeInput" min="1" max="50" value="5" title="Brush/Eraser Size" oninput="updateSize()">
     
-    <button onclick="eraseAll()">Erase All</button>
+    <button onclick="eraseDrawing()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
 
-    <!-- Tracing button and hidden file input -->
     <button onclick="triggerFileInput()">Tracing</button>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
 
-    <!-- Remove Image button, initially hidden -->
     <button id="removeImageBtn" onclick="removeImage()">Remove Image</button>
   </div>
   
-  <canvas id="canvas"></canvas>
+  <div class="canvas-container">
+    <canvas id="backgroundCanvas"></canvas>
+    <canvas id="drawingCanvas"></canvas>
+  </div>
 
   <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+    const backgroundCanvas = document.getElementById('backgroundCanvas');
+    const drawingCanvas = document.getElementById('drawingCanvas');
+    const backgroundCtx = backgroundCanvas.getContext('2d');
+    const drawingCtx = drawingCanvas.getContext('2d');
     const colorPicker = document.getElementById('colorPicker');
     const sizeInput = document.getElementById('sizeInput');
     const fileInput = document.getElementById('fileInput');
@@ -113,16 +119,19 @@
     let currentColor = colorPicker.value;
     let brushSize = sizeInput.value;
     let tracingImage = null;
-    let imageData = null;
 
-    // Resize canvas to fill available space
+    // Resize canvases to fill available space
     function resizeCanvas() {
-      canvas.width = window.innerWidth - document.getElementById('toolbar').offsetWidth;
-      canvas.height = window.innerHeight;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      if (imageData) {
-        ctx.putImageData(imageData, 0, 0); // Restore drawing after resizing
+      const width = window.innerWidth - document.getElementById('toolbar').offsetWidth;
+      const height = window.innerHeight;
+      
+      backgroundCanvas.width = width;
+      backgroundCanvas.height = height;
+      drawingCanvas.width = width;
+      drawingCanvas.height = height;
+
+      if (tracingImage) {
+        backgroundCtx.drawImage(tracingImage, 0, 0, width, height);
       }
     }
 
@@ -132,103 +141,90 @@
     // Tool selector
     function setTool(selectedTool) {
       tool = selectedTool;
-      ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
+      drawingCtx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
     }
 
-    // Update brush color on color picker change
+    // Update brush color
     colorPicker.addEventListener('input', () => {
       currentColor = colorPicker.value;
       if (tool === 'brush') {
-        ctx.strokeStyle = currentColor;
+        drawingCtx.strokeStyle = currentColor;
       }
     });
 
-    // Update brush/eraser size on input change
     function updateSize() {
-      brushSize = Math.min(Math.max(sizeInput.value, 1), 50); // Limit between 1 and 50
+      brushSize = Math.min(Math.max(sizeInput.value, 1), 50);
       sizeInput.value = brushSize;
     }
 
-    // Start drawing
     function startDrawing(x, y) {
       drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+      drawingCtx.beginPath();
+      drawingCtx.moveTo(x, y);
     }
 
-    // Draw on canvas
     function draw(x, y) {
       if (!drawing) return;
 
-      ctx.lineWidth = brushSize;
-      ctx.lineCap = 'round';
-
-      if (tool === 'brush') {
-        ctx.strokeStyle = currentColor;
-      }
-
-      ctx.lineTo(x, y);
-      ctx.stroke();
+      drawingCtx.lineWidth = brushSize;
+      drawingCtx.lineCap = 'round';
+      drawingCtx.strokeStyle = currentColor;
+      drawingCtx.lineTo(x, y);
+      drawingCtx.stroke();
     }
 
-    // Stop drawing
     function stopDrawing() {
       drawing = false;
-      ctx.closePath();
-      imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // Save current drawing
+      drawingCtx.closePath();
     }
 
-    // Mouse events
-    canvas.addEventListener('mousedown', (e) => startDrawing(e.offsetX, e.offsetY));
-    canvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseleave', stopDrawing);
+    drawingCanvas.addEventListener('mousedown', (e) => startDrawing(e.offsetX, e.offsetY));
+    drawingCanvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
+    drawingCanvas.addEventListener('mouseup', stopDrawing);
+    drawingCanvas.addEventListener('mouseleave', stopDrawing);
 
-    // Touch events for mobile support
-    canvas.addEventListener('touchstart', (e) => {
+    drawingCanvas.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
+      const rect = drawingCanvas.getBoundingClientRect();
       startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
       e.preventDefault();
     });
 
-    canvas.addEventListener('touchmove', (e) => {
+    drawingCanvas.addEventListener('touchmove', (e) => {
       const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
+      const rect = drawingCanvas.getBoundingClientRect();
       draw(touch.clientX - rect.left, touch.clientY - rect.top);
       e.preventDefault();
     });
 
-    canvas.addEventListener('touchend', (e) => {
+    drawingCanvas.addEventListener('touchend', (e) => {
       stopDrawing();
       e.preventDefault();
     });
 
-    // Erase all content on the canvas
-    function eraseAll() {
-      ctx.fillStyle = '#ffffff';
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      imageData = null; // Clear drawing history
-      if (tracingImage) {
-        removeImage(); // Hide tracing image if it exists
-      }
+    function eraseDrawing() {
+      drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
     }
 
-    // Save the drawing as a PNG file
     function saveDrawing() {
+      const combinedCanvas = document.createElement('canvas');
+      combinedCanvas.width = drawingCanvas.width;
+      combinedCanvas.height = drawingCanvas.height;
+      const combinedCtx = combinedCanvas.getContext('2d');
+
+      combinedCtx.drawImage(backgroundCanvas, 0, 0);
+      combinedCtx.drawImage(drawingCanvas, 0, 0);
+
       const link = document.createElement('a');
       link.download = 'drawing.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = combinedCanvas.toDataURL('image/png');
       link.click();
     }
 
-    // Trigger file input for tracing image
     function triggerFileInput() {
       fileInput.click();
     }
 
-    // Load selected image onto the canvas at 30% opacity
     function loadImage(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -238,26 +234,18 @@
 
       img.onload = function() {
         tracingImage = img;
-        ctx.globalAlpha = 0.3; // Set opacity to 30%
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1.0; // Reset opacity for further drawings
-        URL.revokeObjectURL(img.src); // Clean up memory
-
-        // Show the Remove Image button
+        backgroundCtx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        URL.revokeObjectURL(img.src);
         removeImageBtn.style.display = 'block';
       };
     }
 
-    // Remove the tracing image from the canvas
     function removeImage() {
-      if (imageData) {
-        ctx.putImageData(imageData, 0, 0); // Restore drawing without tracing image
-      }
-      tracingImage = null; // Clear the tracing image reference
-      removeImageBtn.style.display = 'none'; // Hide the Remove Image button
+      backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+      tracingImage = null;
+      removeImageBtn.style.display = 'none';
     }
 
-    // Initial update for the size input
     updateSize();
   </script>
 </body>
