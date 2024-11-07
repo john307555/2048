@@ -1,76 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dubai Time</title>
-    <style>
-        /* Full viewport styling */
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(black, white);
-            color: white;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        /* Background blur effect */
-        .background-blur {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            filter: blur(8px);
-            z-index: 1;
-        }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #faf8ef;
+      font-family: Arial, sans-serif;
+    }
 
-        /* Time display with cool frame */
-        .time-container {
-            position: relative;
-            z-index: 2;
-            font-size: 3em;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            border-radius: 15px;
-            border: 4px solid rgba(255, 255, 255, 0.3); /* Semi-transparent border */
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), /* Outer glow */
-                        0 0 10px rgba(255, 255, 255, 0.3) inset; /* Inner glow */
-            backdrop-filter: blur(5px); /* Frame blur */
-            background-color: rgba(0, 0, 0, 0.4); /* Slightly transparent background for contrast */
-        }
-    </style>
+    .game-container {
+      position: relative;
+      width: 90vmin;
+      height: 90vmin;
+      max-width: 500px;
+      max-height: 500px;
+      background-color: #bbada0;
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .tile {
+      position: absolute;
+      width: 23%;
+      height: 23%;
+      background: #eee4da;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #776e65;
+      border-radius: 10px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .tile[data-value="2"] { background-color: #eee4da; }
+    .tile[data-value="4"] { background-color: #ede0c8; }
+    .tile[data-value="8"] { background-color: #f2b179; color: #f9f6f2; }
+    .tile[data-value="16"] { background-color: #f59563; color: #f9f6f2; }
+    .tile[data-value="32"] { background-color: #f67c5f; color: #f9f6f2; }
+    .tile[data-value="64"] { background-color: #f65e3b; color: #f9f6f2; }
+    .tile[data-value="128"] { background-color: #edcf72; color: #f9f6f2; }
+    .tile[data-value="256"] { background-color: #edcc61; color: #f9f6f2; }
+    .tile[data-value="512"] { background-color: #edc850; color: #f9f6f2; }
+    .tile[data-value="1024"] { background-color: #edc53f; color: #f9f6f2; }
+    .tile[data-value="2048"] { background-color: #edc22e; color: #f9f6f2; }
+
+    .tile.moving {
+      animation: slide 0.2s ease-out forwards;
+    }
+
+    @keyframes slide {
+      0% {
+        transform: scale(1.2);
+        filter: blur(4px);
+      }
+      100% {
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="game-container" id="gameContainer"></div>
 
-    <!-- Blurred background layer -->
-    <div class="background-blur"></div>
+  <script>
+    const gameSize = 4;
+    let grid = [...Array(gameSize)].map(() => Array(gameSize).fill(0));
 
-    <!-- Time display box with frame -->
-    <div class="time-container" id="dubai-time">
-        <!-- Time will be displayed here -->
-    </div>
+    const gameContainer = document.getElementById('gameContainer');
 
-    <script>
-        // Function to get Dubai time and display it in 12-hour format with AM/PM
-        function updateDubaiTime() {
-            const options = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true, timeZone: 'Asia/Dubai' };
-            const dubaiTimeString = new Date().toLocaleString('en-US', options);
+    function createTileElement(value, x, y) {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.dataset.value = value;
+      tile.textContent = value;
+      tile.style.transform = `translate(${x * 100}%, ${y * 100}%)`;
+      gameContainer.appendChild(tile);
+      return tile;
+    }
 
-            document.getElementById('dubai-time').textContent = dubaiTimeString;
+    function updateGrid() {
+      gameContainer.innerHTML = '';
+      grid.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            createTileElement(value, x, y);
+          }
+        });
+      });
+    }
+
+    function spawnTile() {
+      const emptyCells = [];
+      grid.forEach((row, y) => row.forEach((value, x) => {
+        if (value === 0) emptyCells.push([x, y]);
+      }));
+      const [x, y] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      grid[y][x] = Math.random() > 0.9 ? 4 : 2;
+      updateGrid();
+    }
+
+    function moveTiles(direction) {
+      const directions = {
+        'ArrowUp': [0, -1],
+        'ArrowDown': [0, 1],
+        'ArrowLeft': [-1, 0],
+        'ArrowRight': [1, 0]
+      };
+      const [dx, dy] = directions[direction];
+      let moved = false;
+
+      function slide(x, y, dx, dy) {
+        let value = grid[y][x];
+        grid[y][x] = 0;
+        let nx = x + dx, ny = y + dy;
+        while (grid[ny] && grid[ny][nx] === 0) {
+          x = nx;
+          y = ny;
+          nx += dx;
+          ny += dy;
         }
+        if (grid[ny] && grid[ny][nx] === value) {
+          grid[ny][nx] *= 2;
+        } else {
+          grid[y][x] = value;
+        }
+      }
 
-        // Update the time every second
-        setInterval(updateDubaiTime, 1000);
-        // Initialize the time immediately
-        updateDubaiTime();
-    </script>
+      for (let i = 0; i < gameSize; i++) {
+        for (let j = 0; j < gameSize; j++) {
+          let [x, y] = direction === 'ArrowUp' || direction === 'ArrowLeft' ? [j, i] : [gameSize - 1 - j, gameSize - 1 - i];
+          if (grid[y][x] !== 0) slide(x, y, dx, dy);
+        }
+      }
 
+      spawnTile();
+      updateGrid();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key.startsWith('Arrow')) {
+        moveTiles(event.key);
+      }
+    }
+
+    let touchStartX, touchStartY;
+
+    function handleTouchStart(event) {
+      const touch = event.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }
+
+    function handleTouchMove(event) {
+      if (!touchStartX || !touchStartY) return;
+
+      const touchEndX = event.touches[0].clientX;
+      const touchEndY = event.touches[0].clientY;
+
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        moveTiles(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+      } else {
+        moveTiles(dy > 0 ? 'ArrowDown' : 'ArrowUp');
+      }
+
+      touchStartX = touchStartY = null;
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchmove', handleTouchMove);
+
+    spawnTile();
+    spawnTile();
+  </script>
 </body>
 </html>
