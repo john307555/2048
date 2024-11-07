@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,15 +182,15 @@
     canvas.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      // Adjust touch position by a few pixels to ensure drawing starts exactly under the finger
-      startDrawing(touch.clientX - rect.left, touch.clientY - rect.top + (brushSize / 2));
+      // Remove the vertical offset (brushSize / 2) to align the drawing with the touch point
+      startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
       e.preventDefault();
     });
 
     canvas.addEventListener('touchmove', (e) => {
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      draw(touch.clientX - rect.left, touch.clientY - rect.top + (brushSize / 2));
+      draw(touch.clientX - rect.left, touch.clientY - rect.top);
       e.preventDefault();
     });
 
