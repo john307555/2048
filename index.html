@@ -68,6 +68,11 @@
     #fileInput {
       display: none;
     }
+
+    /* Initially hide Remove Image button */
+    #removeImageBtn {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -84,9 +89,12 @@
     <button onclick="eraseAll()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
 
-    <!-- Tracing button -->
+    <!-- Tracing button and hidden file input -->
     <button onclick="triggerFileInput()">Tracing</button>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+
+    <!-- Remove Image button, initially hidden -->
+    <button id="removeImageBtn" onclick="removeImage()">Remove Image</button>
   </div>
   
   <canvas id="canvas"></canvas>
@@ -97,11 +105,13 @@
     const colorPicker = document.getElementById('colorPicker');
     const sizeInput = document.getElementById('sizeInput');
     const fileInput = document.getElementById('fileInput');
+    const removeImageBtn = document.getElementById('removeImageBtn');
     
     let drawing = false;
     let tool = 'brush';
     let currentColor = colorPicker.value;
     let brushSize = sizeInput.value;
+    let tracingImage = null;
 
     // Resize canvas to fill available space
     function resizeCanvas() {
@@ -193,6 +203,9 @@
       ctx.fillStyle = '#ffffff';
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (tracingImage) {
+        removeImage(); // Hide tracing image if it exists
+      }
     }
 
     // Save the drawing as a PNG file
@@ -217,11 +230,25 @@
       img.src = URL.createObjectURL(file);
 
       img.onload = function() {
+        tracingImage = img;
         ctx.globalAlpha = 0.3; // Set opacity to 30%
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1.0; // Reset opacity to default for further drawings
+        ctx.globalAlpha = 1.0; // Reset opacity for further drawings
         URL.revokeObjectURL(img.src); // Clean up memory
+
+        // Show the Remove Image button
+        removeImageBtn.style.display = 'block';
       };
+    }
+
+    // Remove the tracing image from the canvas
+    function removeImage() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+      resizeCanvas(); // Refill with white background
+      tracingImage = null; // Reset the tracing image reference
+
+      // Hide the Remove Image button
+      removeImageBtn.style.display = 'none';
     }
 
     // Initial update for the size input
