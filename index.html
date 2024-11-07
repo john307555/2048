@@ -27,17 +27,34 @@
       max-height: 500px;
       background-color: #bbada0;
       border-radius: 10px;
-      padding: 10px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
+    }
+
+    .grid-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .grid-cell {
+      width: 100%;
+      height: 100%;
+      background: rgba(238, 228, 218, 0.35);
+      border-radius: 10px;
     }
 
     .tile {
       position: absolute;
       width: 23%;
       height: 23%;
-      background: #eee4da;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -62,13 +79,13 @@
     .tile[data-value="2048"] { background-color: #edc22e; color: #f9f6f2; }
 
     .tile.moving {
-      animation: slide 0.2s ease-out forwards;
+      animation: glide 0.2s ease-out forwards;
     }
 
-    @keyframes slide {
+    @keyframes glide {
       0% {
-        transform: scale(1.2);
-        filter: blur(4px);
+        transform: scale(1.1);
+        filter: blur(3px);
       }
       100% {
         transform: scale(1);
@@ -78,7 +95,27 @@
   </style>
 </head>
 <body>
-  <div class="game-container" id="gameContainer"></div>
+  <div class="game-container" id="gameContainer">
+    <div class="grid-background">
+      <!-- Render static grid cells as background -->
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+      <div class="grid-cell"></div>
+    </div>
+  </div>
 
   <script>
     const gameSize = 4;
@@ -97,11 +134,12 @@
     }
 
     function updateGrid() {
-      gameContainer.innerHTML = '';
+      gameContainer.querySelectorAll('.tile').forEach(tile => tile.remove());
       grid.forEach((row, y) => {
         row.forEach((value, x) => {
           if (value) {
-            createTileElement(value, x, y);
+            const tile = createTileElement(value, x, y);
+            tile.classList.add('moving');
           }
         });
       });
