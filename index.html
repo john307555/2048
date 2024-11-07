@@ -3,234 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2048 Game</title>
+  <title>Drawing App</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #faf8ef;
       font-family: Arial, sans-serif;
     }
 
-    .game-container {
-      position: relative;
-      width: 90vmin;
-      height: 90vmin;
-      max-width: 500px;
-      max-height: 500px;
-      background-color: #bbada0;
-      border-radius: 10px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .grid-background {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .grid-cell {
-      width: 100%;
-      height: 100%;
-      background: rgba(238, 228, 218, 0.35);
-      border-radius: 10px;
-    }
-
-    .tile {
-      position: absolute;
-      width: 23%;
-      height: 23%;
+    #toolbar {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2.5em;
-      font-weight: bold;
-      color: #776e65;
-      border-radius: 10px;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .tile[data-value="2"] { background-color: #eee4da; }
-    .tile[data-value="4"] { background-color: #ede0c8; }
-    .tile[data-value="8"] { background-color: #f2b179; color: #f9f6f2; }
-    .tile[data-value="16"] { background-color: #f59563; color: #f9f6f2; }
-    .tile[data-value="32"] { background-color: #f67c5f; color: #f9f6f2; }
-    .tile[data-value="64"] { background-color: #f65e3b; color: #f9f6f2; }
-    .tile[data-value="128"] { background-color: #edcf72; color: #f9f6f2; }
-    .tile[data-value="256"] { background-color: #edcc61; color: #f9f6f2; }
-    .tile[data-value="512"] { background-color: #edc850; color: #f9f6f2; }
-    .tile[data-value="1024"] { background-color: #edc53f; color: #f9f6f2; }
-    .tile[data-value="2048"] { background-color: #edc22e; color: #f9f6f2; }
-
-    .tile.moving {
-      animation: glide 0.2s ease-out forwards;
+    button, select, input[type="color"] {
+      padding: 8px;
+      font-size: 16px;
+      cursor: pointer;
     }
 
-    @keyframes glide {
-      0% {
-        transform: scale(1.1);
-        filter: blur(3px);
-      }
-      100% {
-        transform: scale(1);
-        filter: blur(0);
-      }
+    #canvas {
+      border: 1px solid #000;
+      cursor: crosshair;
     }
   </style>
 </head>
 <body>
-  <div class="game-container" id="gameContainer">
-    <div class="grid-background">
-      <!-- Render static grid cells as background -->
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-      <div class="grid-cell"></div>
-    </div>
+  <div id="toolbar">
+    <input type="color" id="colorPicker" title="Select Color">
+    <button onclick="setTool('brush')">Brush</button>
+    <button onclick="setTool('eraser')">Eraser</button>
+    <button onclick="fillCanvas()">Fill</button>
+    <button onclick="saveDrawing()">Save as PNG</button>
   </div>
+  
+  <canvas id="canvas" width="800" height="600"></canvas>
 
   <script>
-    const gameSize = 4;
-    let grid = [...Array(gameSize)].map(() => Array(gameSize).fill(0));
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    
+    let drawing = false;
+    let tool = 'brush';
+    let currentColor = colorPicker.value;
 
-    const gameContainer = document.getElementById('gameContainer');
+    // Set canvas background to white by default
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function createTileElement(value, x, y) {
-      const tile = document.createElement('div');
-      tile.classList.add('tile');
-      tile.dataset.value = value;
-      tile.textContent = value;
-      tile.style.transform = `translate(${x * 100}%, ${y * 100}%)`;
-      gameContainer.appendChild(tile);
-      return tile;
-    }
-
-    function updateGrid() {
-      gameContainer.querySelectorAll('.tile').forEach(tile => tile.remove());
-      grid.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            const tile = createTileElement(value, x, y);
-            tile.classList.add('moving');
-          }
-        });
-      });
-    }
-
-    function spawnTile() {
-      const emptyCells = [];
-      grid.forEach((row, y) => row.forEach((value, x) => {
-        if (value === 0) emptyCells.push([x, y]);
-      }));
-      const [x, y] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-      grid[y][x] = Math.random() > 0.9 ? 4 : 2;
-      updateGrid();
-    }
-
-    function moveTiles(direction) {
-      const directions = {
-        'ArrowUp': [0, -1],
-        'ArrowDown': [0, 1],
-        'ArrowLeft': [-1, 0],
-        'ArrowRight': [1, 0]
-      };
-      const [dx, dy] = directions[direction];
-      let moved = false;
-
-      function slide(x, y, dx, dy) {
-        let value = grid[y][x];
-        grid[y][x] = 0;
-        let nx = x + dx, ny = y + dy;
-        while (grid[ny] && grid[ny][nx] === 0) {
-          x = nx;
-          y = ny;
-          nx += dx;
-          ny += dy;
-        }
-        if (grid[ny] && grid[ny][nx] === value) {
-          grid[ny][nx] *= 2;
-        } else {
-          grid[y][x] = value;
-        }
-      }
-
-      for (let i = 0; i < gameSize; i++) {
-        for (let j = 0; j < gameSize; j++) {
-          let [x, y] = direction === 'ArrowUp' || direction === 'ArrowLeft' ? [j, i] : [gameSize - 1 - j, gameSize - 1 - i];
-          if (grid[y][x] !== 0) slide(x, y, dx, dy);
-        }
-      }
-
-      spawnTile();
-      updateGrid();
-    }
-
-    function handleKeyDown(event) {
-      if (event.key.startsWith('Arrow')) {
-        moveTiles(event.key);
-      }
-    }
-
-    let touchStartX, touchStartY;
-
-    function handleTouchStart(event) {
-      const touch = event.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    }
-
-    function handleTouchMove(event) {
-      if (!touchStartX || !touchStartY) return;
-
-      const touchEndX = event.touches[0].clientX;
-      const touchEndY = event.touches[0].clientY;
-
-      const dx = touchEndX - touchStartX;
-      const dy = touchEndY - touchStartY;
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        moveTiles(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+    // Tool selector
+    function setTool(selectedTool) {
+      tool = selectedTool;
+      if (tool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out'; // Eraser mode
       } else {
-        moveTiles(dy > 0 ? 'ArrowDown' : 'ArrowUp');
+        ctx.globalCompositeOperation = 'source-over'; // Normal mode
       }
-
-      touchStartX = touchStartY = null;
     }
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('touchstart', handleTouchStart);
-    document.addEventListener('touchmove', handleTouchMove);
+    // Update color on color picker change
+    colorPicker.addEventListener('input', () => {
+      currentColor = colorPicker.value;
+      if (tool !== 'eraser') {
+        ctx.strokeStyle = currentColor;
+        ctx.fillStyle = currentColor;
+      }
+    });
 
-    spawnTile();
-    spawnTile();
+    // Start drawing
+    canvas.addEventListener('mousedown', (e) => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    // Draw on canvas
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
+      if (tool === 'brush') {
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      } else if (tool === 'eraser') {
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    // Stop drawing
+    canvas.addEventListener('mouseup', () => {
+      drawing = false;
+      ctx.closePath();
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      drawing = false;
+    });
+
+    // Fill canvas with selected color
+    function fillCanvas() {
+      ctx.fillStyle = currentColor;
+      ctx.globalCompositeOperation = 'source-over'; // Normal mode
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Save the drawing as a PNG file
+    function saveDrawing() {
+      const link = document.createElement('a');
+      link.download = 'drawing.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
   </script>
 </body>
 </html>
