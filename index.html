@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>drawing</title>
+  <title>Drawing App</title>
   <style>
-    /* CSS styling remains unchanged */
     * {
       margin: 0;
       padding: 0;
@@ -120,7 +119,6 @@
     let brushSize = sizeInput.value;
     let tracingImage = null;
 
-    // Resize canvases to fill available space
     function resizeCanvas() {
       const width = window.innerWidth - document.getElementById('toolbar').offsetWidth;
       const height = window.innerHeight;
@@ -131,20 +129,21 @@
       drawingCanvas.height = height;
 
       if (tracingImage) {
+        // Draw the tracing image with 30% opacity
+        backgroundCtx.globalAlpha = 0.3;
         backgroundCtx.drawImage(tracingImage, 0, 0, width, height);
+        backgroundCtx.globalAlpha = 1.0; // Reset alpha for future drawings
       }
     }
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Tool selector
     function setTool(selectedTool) {
       tool = selectedTool;
       drawingCtx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over';
     }
 
-    // Update brush color
     colorPicker.addEventListener('input', () => {
       currentColor = colorPicker.value;
       if (tool === 'brush') {
@@ -234,7 +233,10 @@
 
       img.onload = function() {
         tracingImage = img;
+        backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        backgroundCtx.globalAlpha = 0.3; // Set opacity to 30%
         backgroundCtx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        backgroundCtx.globalAlpha = 1.0; // Reset opacity
         URL.revokeObjectURL(img.src);
         removeImageBtn.style.display = 'block';
       };
