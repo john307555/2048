@@ -26,10 +26,10 @@
       background-color: #333;
       color: white;
       align-items: center;
-      min-width: 100px;
+      min-width: 120px;
     }
 
-    button, input[type="color"], input[type="range"] {
+    button, input[type="color"], input[type="number"] {
       padding: 10px;
       font-size: 16px;
       cursor: pointer;
@@ -42,7 +42,7 @@
       transition: transform 0.3s, background-color 0.3s;
     }
 
-    button:hover, input[type="color"]:hover, input[type="range"]:hover {
+    button:hover, input[type="color"]:hover, input[type="number"]:hover {
       background-color: #555;
       transform: scale(1.05);
     }
@@ -54,7 +54,7 @@
       touch-action: none; /* Prevents panning and zooming on touch devices */
     }
 
-    #colorPicker, #sizeSlider {
+    #colorPicker, #sizeInput {
       cursor: pointer;
       padding: 0;
     }
@@ -63,6 +63,21 @@
       font-size: 14px;
       color: white;
     }
+
+    #sizeBarContainer {
+      width: 100%;
+      background-color: #444;
+      border-radius: 8px;
+      height: 10px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    #sizeBar {
+      height: 100%;
+      background-color: #ff6347;
+      width: 10%; /* Default width, based on initial brush size */
+    }
   </style>
 </head>
 <body>
@@ -70,8 +85,13 @@
     <input type="color" id="colorPicker" title="Brush Color">
     <button onclick="setTool('brush')">Brush</button>
     <button onclick="setTool('eraser')">Eraser</button>
-    <label for="sizeSlider">Size: <span id="sizeDisplay">5</span> px</label>
-    <input type="range" id="sizeSlider" min="1" max="50" value="5" title="Brush/Eraser Size">
+
+    <label for="sizeInput">Size:</label>
+    <input type="number" id="sizeInput" min="1" max="50" value="5" title="Brush/Eraser Size" oninput="updateSize()">
+    <div id="sizeBarContainer">
+      <div id="sizeBar"></div>
+    </div>
+    
     <button onclick="eraseAll()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
   </div>
@@ -82,13 +102,13 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const colorPicker = document.getElementById('colorPicker');
-    const sizeSlider = document.getElementById('sizeSlider');
-    const sizeDisplay = document.getElementById('sizeDisplay');
+    const sizeInput = document.getElementById('sizeInput');
+    const sizeBar = document.getElementById('sizeBar');
     
     let drawing = false;
     let tool = 'brush';
     let currentColor = colorPicker.value;
-    let brushSize = sizeSlider.value;
+    let brushSize = sizeInput.value;
 
     // Resize canvas to fill available space
     function resizeCanvas() {
@@ -116,11 +136,12 @@
       }
     });
 
-    // Update brush/eraser size on slider change
-    sizeSlider.addEventListener('input', () => {
-      brushSize = sizeSlider.value;
-      sizeDisplay.textContent = brushSize;
-    });
+    // Update brush/eraser size on input change
+    function updateSize() {
+      brushSize = Math.min(Math.max(sizeInput.value, 1), 50); // Limit between 1 and 50
+      sizeInput.value = brushSize;
+      sizeBar.style.width = `${(brushSize / 50) * 100}%`; // Update size bar proportionally
+    }
 
     // Start drawing
     function startDrawing(x, y) {
@@ -190,6 +211,9 @@
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
+
+    // Initial update for the size bar
+    updateSize();
   </script>
 </body>
 </html>
