@@ -91,6 +91,9 @@
     
     <button onclick="eraseDrawing()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
+    
+    <button onclick="undo()">Undo</button>
+    <button onclick="redo()">Redo</button>
 
     <button onclick="triggerFileInput()">Tracing</button>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
@@ -119,6 +122,9 @@
     let brushSize = sizeInput.value;
     let tracingImage = null;
 
+    const undoStack = [];
+    const redoStack = [];
+
     function resizeCanvas() {
       const width = window.innerWidth - document.getElementById('toolbar').offsetWidth;
       const height = window.innerHeight;
@@ -129,10 +135,9 @@
       drawingCanvas.height = height;
 
       if (tracingImage) {
-        // Draw the tracing image with 30% opacity
         backgroundCtx.globalAlpha = 0.3;
         backgroundCtx.drawImage(tracingImage, 0, 0, width, height);
-        backgroundCtx.globalAlpha = 1.0; // Reset alpha for future drawings
+        backgroundCtx.globalAlpha = 1.0;
       }
     }
 
@@ -152,13 +157,45 @@
     });
 
     function updateSize() {
-      brushSize = sizeInput.value; // Removed limits here
+      brushSize = sizeInput.value;
+    }
+
+    function saveState() {
+      if (undoStack.length >= 10) undoStack.shift();
+      undoStack.push(drawingCanvas.toDataURL());
+      redoStack.length = 0;
+    }
+
+    function undo() {
+      if (undoStack.length > 0) {
+        redoStack.push(drawingCanvas.toDataURL());
+        const previousState = undoStack.pop();
+        restoreState(previousState);
+      }
+    }
+
+    function redo() {
+      if (redoStack.length > 0) {
+        undoStack.push(drawingCanvas.toDataURL());
+        const nextState = redoStack.pop();
+        restoreState(nextState);
+      }
+    }
+
+    function restoreState(state) {
+      const img = new Image();
+      img.src = state;
+      img.onload = () => {
+        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        drawingCtx.drawImage(img, 0, 0);
+      };
     }
 
     function startDrawing(x, y) {
       drawing = true;
       drawingCtx.beginPath();
       drawingCtx.moveTo(x, y);
+      saveState();
     }
 
     function draw(x, y) {
@@ -202,6 +239,7 @@
 
     function eraseDrawing() {
       drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+      saveState();
     }
 
     function saveDrawing() {
@@ -233,9 +271,9 @@
       img.onload = function() {
         tracingImage = img;
         backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-        backgroundCtx.globalAlpha = 0.3; // Set opacity to 30%
+        backgroundCtx.globalAlpha = 0.3;
         backgroundCtx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
-        backgroundCtx.globalAlpha = 1.0; // Reset opacity
+        backgroundCtx.globalAlpha = 1.0;
         URL.revokeObjectURL(img.src);
         removeImageBtn.style.display = 'block';
       };
