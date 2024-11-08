@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drawing App</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -29,7 +30,7 @@
       min-width: 120px;
     }
 
-    button, input[type="color"], input[type="number"] {
+    button, input[type="color"], input[type="number"], .icon-button {
       padding: 10px;
       font-size: 16px;
       cursor: pointer;
@@ -40,9 +41,12 @@
       border-radius: 8px;
       width: 100%;
       transition: transform 0.3s, background-color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    button:hover, input[type="color"]:hover, input[type="number"]:hover {
+    button:hover, input[type="color"]:hover, input[type="number"]:hover, .icon-button:hover {
       background-color: #555;
       transform: scale(1.05);
     }
@@ -76,6 +80,21 @@
     #removeImageBtn {
       display: none;
     }
+
+    /* Style for the tiny icon buttons */
+    .icon-button {
+      width: auto;
+      padding: 5px;
+      border-radius: 50%;
+      font-size: 24px;
+      background-color: transparent;
+      color: #fff;
+    }
+
+    .icon-button:hover {
+      background-color: #555;
+    }
+
   </style>
 </head>
 <body>
@@ -92,8 +111,9 @@
     <button onclick="eraseDrawing()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
     
-    <button onclick="undo()">Undo</button>
-    <button onclick="redo()">Redo</button>
+    <!-- Undo and Redo icon buttons -->
+    <span class="icon-button material-icons" onclick="undo()" title="Undo">undo</span>
+    <span class="icon-button material-icons" onclick="redo()" title="Redo">redo</span>
 
     <button onclick="triggerFileInput()">Tracing</button>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
