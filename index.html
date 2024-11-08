@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>drawing</title>
+  <title>Drawing App</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     * {
@@ -108,6 +108,12 @@
       color: white;
     }
 
+    /* Flex container for undo/redo buttons side by side */
+    .icon-row {
+      display: flex;
+      gap: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -124,14 +130,16 @@
     <button onclick="eraseDrawing()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
 
-    <!-- Undo and Redo icon buttons with labels on top -->
-    <div class="icon-container">
-      <span class="icon-label">Undo</span>
-      <span class="icon-button material-icons" onclick="undo()" title="Undo">undo</span>
-    </div>
-    <div class="icon-container">
-      <span class="icon-label">Redo</span>
-      <span class="icon-button material-icons" onclick="redo()" title="Redo">redo</span>
+    <!-- Undo and Redo icon buttons side by side with labels on top -->
+    <div class="icon-row">
+      <div class="icon-container">
+        <span class="icon-label">Undo</span>
+        <span class="icon-button material-icons" onclick="undo()" title="Undo">undo</span>
+      </div>
+      <div class="icon-container">
+        <span class="icon-label">Redo</span>
+        <span class="icon-button material-icons" onclick="redo()" title="Redo">redo</span>
+      </div>
     </div>
 
     <button onclick="triggerFileInput()">Tracing</button>
