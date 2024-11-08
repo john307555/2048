@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drawing App</title>
+  <title>drawing</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     * {
@@ -95,6 +95,19 @@
       background-color: #555;
     }
 
+    /* Styling for undo/redo labels */
+    .icon-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .icon-label {
+      font-size: 12px;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
@@ -110,10 +123,16 @@
     
     <button onclick="eraseDrawing()">Erase All</button>
     <button onclick="saveDrawing()">Save as PNG</button>
-    
-    <!-- Undo and Redo icon buttons -->
-    <span class="icon-button material-icons" onclick="undo()" title="Undo">undo</span>
-    <span class="icon-button material-icons" onclick="redo()" title="Redo">redo</span>
+
+    <!-- Undo and Redo icon buttons with labels on top -->
+    <div class="icon-container">
+      <span class="icon-label">Undo</span>
+      <span class="icon-button material-icons" onclick="undo()" title="Undo">undo</span>
+    </div>
+    <div class="icon-container">
+      <span class="icon-label">Redo</span>
+      <span class="icon-button material-icons" onclick="redo()" title="Redo">redo</span>
+    </div>
 
     <button onclick="triggerFileInput()">Tracing</button>
     <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
